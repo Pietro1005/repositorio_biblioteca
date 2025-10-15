@@ -1,26 +1,21 @@
 import requests
 
-url = "https://www.carqueryapi.com/api/0.3/?cmd=getMakes"
+def obter_info_pokemon(nome):
+    url = f"https://pokeapi.co/api/v2/pokemon/{nome.lower()}"
+    resposta = requests.get(url)
 
-response = requests.get(url)
+    if resposta.status_code == 200:
+        dados = resposta.json()
+        nome = dados['name']
+        tipos = [t['type']['name'] for t in dados['types']]
+        habilidades = [h['ability']['name'] for h in dados['abilities']]
 
-if response.status_code == 200:
+        print(f"Pokémon: {nome.capitalize()}")
+        print("Tipos:", ", ".join(tipos))
+        print("Habilidades:", ", ".join(habilidades))
+    else:
+        print(f"Pokémon '{nome}' não encontrado.")
 
-    text = response.text
-
-    json_str = text.strip()
-    if json_str.startswith("var makes ="):
-        json_str = json_str[len("var makes = "):]
-    if json_str.endswith(";"):
-        json_str = json_str[:-1]
-    
-    import json
-    data = json.loads(json_str)
-    
-    makes = data.get('Makes', [])
-    
-    print("Marcas de carros encontradas:")
-    for make in makes[:10]:
-        print(f"- {make['make_display']} ({make['make_country']})")
-else:
-    print(f"Erro ao acessar API. Status: {response.status_code}")
+if __name__ == "__main__":
+    nome_pokemon = input("Digite o nome do Pokémon: ")
+    obter_info_pokemon(nome_pokemon)
